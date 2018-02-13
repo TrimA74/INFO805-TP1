@@ -45,6 +45,13 @@ struct Vecteur {
         (other.xyz[0] < xyz[0]) ? z=xyz[2] : z = other.xyz[2];
         return Vecteur(x,y,z);
     }
+    Vecteur cross( const Vecteur& v ) const{
+        return Vecteur (
+                ((*this)[1] * v[2]) - ((*this)[2] * v[1]),
+                ((*this)[2] * v[0]) - ((*this)[0] * v[2]),
+                ((*this)[0] * v[1]) - ((*this)[1] * v[0])
+        );
+    }
 
 };
 
@@ -110,9 +117,12 @@ struct TriangleSoup {
         }
 
     }
-    void boundingBox( Vecteur& low, Vecteur& up){
+    void boundingBox( Vecteur& low, Vecteur& up) const {
         for ( std::vector<Triangle>::const_iterator it = triangles.begin(), itE = triangles.end(); it != itE; ++it ) {
-
+            for (int i = 0; i < 3; ++i) {
+                low = low.inf((*it)[i]);
+                up = low.sup((*it)[i]);
+            }
         }
     }
 };

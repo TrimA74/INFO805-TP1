@@ -54,6 +54,15 @@ void Viewer::draw()
 
 void Viewer::init()
 {
+
+  Vecteur low,up;
+  this->ptrSoup->boundingBox(low,up);
+  qglviewer::Vec lowVec = qglviewer::Vec(low[0],low[1],low[2]);
+  qglviewer::Vec upVec = qglviewer::Vec(up[0],up[1],up[2]);
+  camera()->setSceneBoundingBox(lowVec,upVec);
+  // ou camera()->setSceneRadius( ... );
+  camera()->showEntireScene();
+
   // Restore previous viewer state.
   // restoreStateFromFile();
 
