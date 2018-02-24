@@ -8,17 +8,25 @@ using namespace std;
 void Viewer::draw()
 {
 
-  const float nbSteps = 200.0;
+    const float nbSteps = 200.0;
 
-  float colorBronzeDiff[4] = { 0.8, 0.6, 0.0, 1.0 };
-  float colorRedDiff[4]    = { 1.0, 0.0, 0.0, 1.0 };
-  float colorGreenDiff[4]  = { 0.0, 1.0, 0.0, 1.0 };
-  float colorBlueDiff[4]   = { 0.0, 0.0, 1.0, 1.0 };
+    float colorBronzeDiff[4] = { 0.8, 0.6, 0.0, 1.0 };
+    float colorRedDiff[4]    = { 1.0, 0.0, 0.0, 1.0 };
+    float colorGreenDiff[4]  = { 0.0, 1.0, 0.0, 1.0 };
+    float colorBlueDiff[4]   = { 0.0, 0.0, 1.0, 1.0 };
 
-  // Draws triangles given by 3 vertices.
-  glBegin(GL_TRIANGLES);
-  for ( std::vector<Triangle>::const_iterator it = this->ptrSoup->triangles.begin(), itE = this->ptrSoup->triangles.end(); it != itE; ++it ) {
-
+    float colorBronzeSpec[4] = { 1.0, 1.0, 0.4, 1.0 };
+    float colorNull      [4] = { 0.0, 0.0, 0.0, 1.0 };
+    // Draws triangles given by 3 vertices.
+    glBegin(GL_TRIANGLES);
+    glColor4fv(colorBronzeDiff);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, colorBronzeDiff);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, colorBronzeSpec);
+    glMaterialf(GL_FRONT, GL_SHININESS, 20.0f );
+    for ( std::vector<Triangle>::const_iterator it = this->ptrSoup->triangles.begin(), itE = this->ptrSoup->triangles.end(); it != itE; ++it ) {
+      const Triangle& T = (*it);
+      Vecteur n = T.normal();
+      glNormal3f( n[ 0 ], n[ 1 ], n[ 2 ] );
     glVertex3f( (*it)[0][0],
                 (*it)[0][1],
                 (*it)[0][2]);
@@ -29,26 +37,8 @@ void Viewer::draw()
                 (*it)[2][1],
                 (*it)[2][2]);
     glColor4fv(colorBronzeDiff);
-  }
-  /*
-  glColor4fv(colorBronzeDiff);
-  glVertex3f( 0.0, 0.0, 0.0 );
-  glVertex3f( 1.0, 0.0, 0.0 );
-  glVertex3f( 0.0, 1.0, 0.0 );
-  glColor4fv(colorRedDiff);
-  glVertex3f( 1.0, 0.0, 0.0 );
-  glVertex3f( 0.0, 1.0, 0.0 );
-  glVertex3f( 0.0, 0.0, 1.0 );
-  glColor4fv(colorGreenDiff);
-  glVertex3f( 0.0, 0.0, 0.0 );
-  glVertex3f( 0.0, 1.0, 0.0 );
-  glVertex3f( 0.0, 0.0, 1.0 );
-  glColor4fv(colorBlueDiff);
-  glVertex3f( 0.0, 0.0, 0.0 );
-  glVertex3f( 1.0, 0.0, 0.0 );
-  glVertex3f( 0.0, 0.0, 1.0 );
-  */
-  glEnd();
+    }
+    glEnd();
 }
 
 

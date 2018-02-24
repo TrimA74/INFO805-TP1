@@ -4,6 +4,4 @@
 
 #include "Utils.hpp"
 
-/***
- * Pour cross il faut utiliser (*this)
- */
+

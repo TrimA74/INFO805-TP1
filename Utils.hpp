@@ -10,6 +10,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 
 struct Vecteur {
@@ -25,6 +26,12 @@ struct Vecteur {
     }
     float& operator[]( int i ){
         return xyz[i];
+    }
+    Vecteur operator-(Vecteur other){
+        return Vecteur(other[0] - xyz[0],
+                       other[1] - xyz[1],
+                       other[2] - xyz[2]
+        );
     }
 
     // Retourne le vecteur dont les composantes sont les minima des
@@ -77,6 +84,19 @@ struct Triangle {
     Vecteur& operator[]( int i ){
         return xyz[i];
     }
+    Vecteur normal() const {
+        Vecteur v = xyz[1] - xyz[0];
+        Vecteur u = xyz[2] - xyz[1];
+        v.cross(u);
+        double longueur = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2])  );
+        /***
+         * Normalisation  du vecteur
+         */
+        v[0] = (float ) (v[0] / longueur);
+        v[1] = (float )  (v[1] / longueur);
+        v[2] = (float )  (v[2] / longueur);
+        return v;
+    }
 
 };
 
@@ -126,6 +146,60 @@ struct TriangleSoup {
         }
     }
 };
+
+/// Définit un index sur 3 entiers. Toutes les opérations usuelles
+/// sont surchargées (accès, comparaisons, égalité).
+struct Index {
+    int idx[ 3 ];
+    Index() {}
+    Index( int i0, int i1, int i2 )
+    {
+        idx[ 0 ] = i0;
+        idx[ 1 ] = i1;
+        idx[ 2 ] = i2;
+    }
+    Index( int indices[] )
+    {
+        idx[ 0 ] = indices[ 0 ];
+        idx[ 1 ] = indices[ 1 ];
+        idx[ 2 ] = indices[ 2 ];
+    }
+    int  operator[]( int i ) const { return idx[ i ]; }
+    int& operator[]( int i )       { return idx[ i ]; }
+    bool operator<( const Index& other ) const
+    {
+        return ( idx[ 0 ] < other.idx[ 0 ] )
+               || ( ( idx[ 0 ] == other.idx[ 0 ] )
+                    && ( ( idx[ 1 ] < other.idx[ 1 ] )
+                         || ( ( idx[ 1 ] == other.idx[ 1 ] )
+                              && ( idx[ 2 ] < other.idx[ 2 ] ) ) ) );
+    }
+    bool operator==(const Index& other) const {
+        return ( idx[ 0 ] == other.idx[ 0 ] )
+                    && ( ( idx[ 1 ] == other.idx[ 1 ] )
+                              && ( idx[ 2 ] ==other.idx[ 2 ] ) );
+    }
+};
+
+struct TriangleSoupZipper {
+    TriangleSoup _anInput;
+    TriangleSoup _anOutput;
+    Index size;
+    // Construit le zipper avec une soupe de triangle en entrée \a
+    // anInput, une soupe de triangle en sortie \a anOutput, et un index \a size
+    // qui est le nombre de cellules de la boîte découpée selon les 3 directions.
+    TriangleSoupZipper( const TriangleSoup& anInput,
+                        TriangleSoup& anOuput,
+                        Index size ) {
+        this->_anInput = anInput;
+        this->_anOutput = anOuput;
+        this->size = size;
+
+    }
+
+};
+
+
 
 
 
