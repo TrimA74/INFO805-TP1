@@ -27,11 +27,14 @@ struct Vecteur {
     float& operator[]( int i ){
         return xyz[i];
     }
-    Vecteur operator-(Vecteur other){
-        return Vecteur(other[0] - xyz[0],
-                       other[1] - xyz[1],
-                       other[2] - xyz[2]
+    Vecteur operator-(Vecteur other) const{
+        return Vecteur((*this)[0] - other[0],
+                       (*this)[1] - other[1],
+                       (*this)[2] - other[2]
         );
+    }
+    Vecteur operator/(float value) const {
+        return Vecteur((*this)[0] / value, (*this)[1] / value, (*this)[2] / value);
     }
 
     // Retourne le vecteur dont les composantes sont les minima des
@@ -54,11 +57,13 @@ struct Vecteur {
     }
     Vecteur cross( const Vecteur& v ) const{
         return Vecteur (
-                ((*this)[1] * v[2]) - ((*this)[2] * v[1]),
-                ((*this)[2] * v[0]) - ((*this)[0] * v[2]),
-                ((*this)[0] * v[1]) - ((*this)[1] * v[0])
+                (*this)[1] * v[2] - (*this)[2] * v[1],
+                (*this)[2] * v[0] - (*this)[0] * v[2],
+                (*this)[0] * v[1] - (*this)[1] * v[0]
         );
     }
+
+
 
 };
 
@@ -86,16 +91,13 @@ struct Triangle {
     }
     Vecteur normal() const {
         Vecteur v = xyz[1] - xyz[0];
-        Vecteur u = xyz[2] - xyz[1];
-        v.cross(u);
-        double longueur = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2])  );
+        Vecteur u = xyz[2] - xyz[0];
+        u.cross(v);
+        float norm =  sqrt((u[0] * u[0]) + (u[1] * u[1]) + (u[2] * u[2])  );
         /***
          * Normalisation  du vecteur
          */
-        v[0] = (float ) (v[0] / longueur);
-        v[1] = (float )  (v[1] / longueur);
-        v[2] = (float )  (v[2] / longueur);
-        return v;
+        return v / norm;
     }
 
 };
@@ -141,7 +143,7 @@ struct TriangleSoup {
         for ( std::vector<Triangle>::const_iterator it = triangles.begin(), itE = triangles.end(); it != itE; ++it ) {
             for (int i = 0; i < 3; ++i) {
                 low = low.inf((*it)[i]);
-                up = low.sup((*it)[i]);
+                up = up.sup((*it)[i]);
             }
         }
     }

@@ -8,15 +8,15 @@ using namespace std;
 void Viewer::draw()
 {
 
-    const float nbSteps = 200.0;
+    //const float nbSteps = 200.0;
 
     float colorBronzeDiff[4] = { 0.8, 0.6, 0.0, 1.0 };
-    float colorRedDiff[4]    = { 1.0, 0.0, 0.0, 1.0 };
-    float colorGreenDiff[4]  = { 0.0, 1.0, 0.0, 1.0 };
-    float colorBlueDiff[4]   = { 0.0, 0.0, 1.0, 1.0 };
+    //float colorRedDiff[4]    = { 1.0, 0.0, 0.0, 1.0 };
+    //float colorGreenDiff[4]  = { 0.0, 1.0, 0.0, 1.0 };
+    //float colorBlueDiff[4]   = { 0.0, 0.0, 1.0, 1.0 };
 
     float colorBronzeSpec[4] = { 1.0, 1.0, 0.4, 1.0 };
-    float colorNull      [4] = { 0.0, 0.0, 0.0, 1.0 };
+    //float colorNull      [4] = { 0.0, 0.0, 0.0, 1.0 };
     // Draws triangles given by 3 vertices.
     glBegin(GL_TRIANGLES);
     glColor4fv(colorBronzeDiff);
@@ -24,7 +24,7 @@ void Viewer::draw()
     glMaterialfv(GL_FRONT, GL_SPECULAR, colorBronzeSpec);
     glMaterialf(GL_FRONT, GL_SHININESS, 20.0f );
     for ( std::vector<Triangle>::const_iterator it = this->ptrSoup->triangles.begin(), itE = this->ptrSoup->triangles.end(); it != itE; ++it ) {
-      const Triangle& T = (*it);
+      const Triangle& T = *(it);
       Vecteur n = T.normal();
       glNormal3f( n[ 0 ], n[ 1 ], n[ 2 ] );
     glVertex3f( (*it)[0][0],
@@ -41,15 +41,15 @@ void Viewer::draw()
     glEnd();
 }
 
-
+qglviewer::Vec convertToVec(Vecteur& v){
+    return qglviewer::Vec(v[0],v[1],v[2]);
+}
 void Viewer::init()
 {
 
   Vecteur low,up;
   this->ptrSoup->boundingBox(low,up);
-  qglviewer::Vec lowVec = qglviewer::Vec(low[0],low[1],low[2]);
-  qglviewer::Vec upVec = qglviewer::Vec(up[0],up[1],up[2]);
-  camera()->setSceneBoundingBox(lowVec,upVec);
+    camera()->setSceneBoundingBox(convertToVec(low),convertToVec(up));
   // ou camera()->setSceneRadius( ... );
   camera()->showEntireScene();
 
@@ -59,6 +59,9 @@ void Viewer::init()
   // Opens help window
   help();
 }
+
+
+
 
 QString Viewer::helpString() const
 {
