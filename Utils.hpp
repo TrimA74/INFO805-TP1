@@ -42,8 +42,8 @@ struct Vecteur {
     Vecteur inf( const Vecteur& other ) const {
         float x,y,z;
         (xyz[0] < other.xyz[0]) ? x=xyz[0] : x = other.xyz[0];
-        (xyz[0] < other.xyz[0]) ? y=xyz[1] : y = other.xyz[1];
-        (xyz[0] < other.xyz[0]) ? z=xyz[2] : z = other.xyz[2];
+        (xyz[1] < other.xyz[1]) ? y=xyz[1] : y = other.xyz[1];
+        (xyz[2] < other.xyz[2]) ? z=xyz[2] : z = other.xyz[2];
         return Vecteur(x,y,z);
     }
     // Retourne le vecteur dont les composantes sont les maxima des
@@ -51,8 +51,8 @@ struct Vecteur {
     Vecteur sup( const Vecteur& other ) const{
         float x,y,z;
         (other.xyz[0] < xyz[0]) ? x=xyz[0] : x = other.xyz[0];
-        (other.xyz[0] < xyz[0]) ? y=xyz[1] : y = other.xyz[1];
-        (other.xyz[0] < xyz[0]) ? z=xyz[2] : z = other.xyz[2];
+        (other.xyz[1] < xyz[1]) ? y=xyz[1] : y = other.xyz[1];
+        (other.xyz[2] < xyz[2]) ? z=xyz[2] : z = other.xyz[2];
         return Vecteur(x,y,z);
     }
     Vecteur cross( const Vecteur& v ) const{
@@ -202,6 +202,12 @@ struct TriangleSoupZipper {
         this->size = size;
 
     }
+
+    /// @return l'index de la cellule dans laquelle tombe \a p.
+    Index index( const Vecteur& p ) const;
+    /// @return le centroïde de la cellule d'index \a idx (son "centre").
+    Vecteur centroid( const Index& idx ) const;
+
 
 };
 
