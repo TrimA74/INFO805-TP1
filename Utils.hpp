@@ -56,12 +56,21 @@ struct Vecteur {
         return Vecteur(x,y,z);
     }
     Vecteur cross( const Vecteur& v ) const{
-        return Vecteur (
-                (*this)[1] * v[2] - (*this)[2] * v[1],
-                (*this)[2] * v[0] - (*this)[0] * v[2],
-                (*this)[0] * v[1] - (*this)[1] * v[0]
+        return Vecteur((*this)[1] * (v[2]) - (*this)[2] * v[1],
+                       (*this)[2] * v[0] - (*this)[0] * v[2],
+                       (*this)[0] * v[1] - (*this)[1] * v[0]
         );
     }
+
+    Vecteur normalize() {
+        float sum = 0;
+        for(int i=0; i<3; i++) {
+            sum+=xyz[i] * xyz[i];
+        }
+        float norm = sqrt(sum);
+        return Vecteur((*this)[0]/norm,(*this)[1]/norm, (*this)[2]/norm);
+    }
+
 
 
 
@@ -89,15 +98,10 @@ struct Triangle {
     Vecteur& operator[]( int i ){
         return xyz[i];
     }
-    Vecteur normal() const {
-        Vecteur v = xyz[1] - xyz[0];
-        Vecteur u = xyz[2] - xyz[0];
-        u.cross(v);
-        float norm =  sqrt((u[0] * u[0]) + (u[1] * u[1]) + (u[2] * u[2])  );
-        /***
-         * Normalisation  du vecteur
-         */
-        return v / norm;
+    Vecteur normal() const{
+        Vecteur u = xyz[1] - xyz[0];
+        Vecteur v = xyz[2] - xyz[0];
+        return u.cross(v).normalize();
     }
 
 };
