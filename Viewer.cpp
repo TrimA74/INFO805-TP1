@@ -15,6 +15,8 @@ void Viewer::draw()
     //float colorGreenDiff[4]  = { 0.0, 1.0, 0.0, 1.0 };
     //float colorBlueDiff[4]   = { 0.0, 0.0, 1.0, 1.0 };
 
+    float colors[4][4] = {{ 0.8, 0.6, 0.0, 1.0 }, { 1.0, 0.5, 0.0, 1.0 }, { 0.0, 1.0, 0.4, 1.0 }, { 0.0, 0.2, 1.0, 1.0 }};
+    int colorId = 0;
     float colorBronzeSpec[4] = { 1.0, 1.0, 0.4, 1.0 };
     //float colorNull      [4] = { 0.0, 0.0, 0.0, 1.0 };
     // Draws triangles given by 3 vertices.
@@ -27,16 +29,13 @@ void Viewer::draw()
       const Triangle& T = *(it);
       Vecteur n = T.normal();
       glNormal3f( n[ 0 ], n[ 1 ], n[ 2 ] );
-    glVertex3f( (*it)[0][0],
-                (*it)[0][1],
-                (*it)[0][2]);
-    glVertex3f( (*it)[1][0],
-                (*it)[1][1],
-                (*it)[1][2]);
-    glVertex3f( (*it)[2][0],
-                (*it)[2][1],
-                (*it)[2][2]);
-    glColor4fv(colorBronzeDiff);
+        for (int i = 0; i < 3; ++i) {
+            glVertex3f( (*it)[i][0],
+                        (*it)[i][1],
+                        (*it)[i][2]);
+        }
+        glColor4fv(colors[(colorId++)%4]);
+    //glColor4fv(colorBronzeDiff);
     }
     glEnd();
 }
