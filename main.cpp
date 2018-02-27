@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     TriangleSoup anOutput;
 
     TriangleSoupZipper tsz = TriangleSoupZipper(ts, anOutput, Index(atoi(argv[2]), atoi(argv[3]), atoi(argv[4])));
-    tsz.zip();
+    tsz.smartZip();
     viewer.ptrSoup = &tsz._anOutput;
 
     std::cout << "taille sortie  :  " <<  tsz._anOutput.triangles.size() << std::endl;

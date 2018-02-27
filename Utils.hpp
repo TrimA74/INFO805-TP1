@@ -274,7 +274,7 @@ struct TriangleSoupZipper {
             }
             else
             {
-                
+
                 Vecteur v1 = centroid(i1);
                 Vecteur v2 = centroid(i2);
                 Vecteur v3 = centroid(i3);
@@ -297,18 +297,20 @@ struct TriangleSoupZipper {
 
         this->zip();
 
+
+
         for ( std::vector<Triangle>::iterator it = this->_anOutput.triangles.begin(), itE = this->_anOutput.triangles.end(); it != itE; ++it )
         {
             Index i1 = index((*it)[0]);
             Index i2 = index((*it)[1]);
             Index i3 = index((*it)[2]);
 
-
-            (*it).xyz[0] = index2data[i1].barycenter();
-            (*it).xyz[1] = index2data[i3].barycenter();
-            (*it).xyz[2] = index2data[i2].barycenter();
+            (*it)[0] = index2data[i1].barycenter();
+            (*it)[1] = index2data[i2].barycenter();
+            (*it)[2] = index2data[i3].barycenter();
             
         }
+
     }
 
 };
