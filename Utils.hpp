@@ -191,6 +191,8 @@ struct TriangleSoupZipper {
     TriangleSoup _anInput;
     TriangleSoup _anOutput;
     Index size;
+    Vecteur low;
+    Vecteur up;
     // Construit le zipper avec une soupe de triangle en entrée \a
     // anInput, une soupe de triangle en sortie \a anOutput, et un index \a size
     // qui est le nombre de cellules de la boîte découpée selon les 3 directions.
@@ -200,14 +202,61 @@ struct TriangleSoupZipper {
         this->_anInput = anInput;
         this->_anOutput = anOuput;
         this->size = size;
+        this->_anInput.boundingBox(this->low,this->up);
 
     }
 
     /// @return l'index de la cellule dans laquelle tombe \a p.
-    Index index( const Vecteur& p ) const;
-    /// @return le centroïde de la cellule d'index \a idx (son "centre").
-    Vecteur centroid( const Index& idx ) const;
+    Index index( const Vecteur& p) const {
+        //formule : (index - debut ) / ((fin-debut)/distance-grille)
+        Index i;
+        
+        i.idx[0] = (int)(p.xyz[0] - low[0]) / ((up.xyz[0] - low.xyz[0]) / size.idx[0]);
+        i.idx[1] = (int)(p.xyz[1] - low[1]) / ((up.xyz[1] - low.xyz[1]) / size.idx[1]);
+        i.idx[2] = (int)(p.xyz[2] - low[2]) / ((up.xyz[2] - low.xyz[2]) / size.idx[2]);
 
+        return i;
+    } 
+    /// @return le centroïde de la cellule d'index \a idx (son "centre").
+    Vecteur centroid( const Index& idx ) const {
+        Vecteur v;
+        //calcul du centroid
+        v.xyz[0] = idx.idx[0]+(((up.xyz[0] - low.xyz[0]) / size.idx[0])/2)+low[0];
+        v.xyz[1] = idx.idx[1]+(((up.xyz[1] - low.xyz[1]) / size.idx[1])/2)+low[1];
+        v.xyz[2] = idx.idx[2]+(((up.xyz[2] - low.xyz[2]) / size.idx[2])/2)+low[2];
+
+        return v;
+    }
+
+    void zip(){
+    
+        
+        for ( std::vector<Triangle>::const_iterator it = this->_anInput.triangles.begin(), itE = this->_anInput.triangles.end(); it != itE; ++it )
+        {
+            Index i1 = index((*it)[0]);
+            Index i2 = index((*it)[1]);
+            Index i3 = index((*it)[2]);
+
+            if(i1 == i2 || i1 == i3 || i2 == i3)
+            {
+                //on jette le triangle
+            }
+            else
+            {
+
+                Vecteur v1 = centroid(i1);
+                Vecteur v2 = centroid(i2);
+                Vecteur v3 = centroid(i3);
+
+                Triangle newT = Triangle(v1, v2, v3);
+                //on l'ajoute
+                this->_anOutput.triangles.push_back(newT);
+            }
+
+
+
+        }
+    }
 
 };
 
