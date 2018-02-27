@@ -187,6 +187,33 @@ struct Index {
     }
 };
 
+
+
+
+// Structure pour calculer le barycentre d'un ensemble de points.
+struct CellData {
+  Vecteur acc;
+  int nb;
+  // Crée un accumulateur vide.
+  CellData(): acc(), nb(0) {}
+  // Ajoute le point v à l'accumulateur.
+  void add( const Vecteur& v ){
+    acc.xyz[0] += v.xyz[0];
+    acc.xyz[1] += v.xyz[1];
+    acc.xyz[2] += v.xyz[2];
+
+    nb++;
+  }
+  // Retourne le barycentre de tous les points ajoutés.
+  Vecteur barycenter() const{
+    Vecteur v;
+    v.xyz[0] = acc[0]/nb;
+    v.xyz[1] = acc[1]/nb;
+    v.xyz[2] = acc[2]/nb;
+    return v;
+  }
+};
+
 struct TriangleSoupZipper {
     TriangleSoup _anInput;
     TriangleSoup _anOutput;
@@ -194,7 +221,7 @@ struct TriangleSoupZipper {
     Vecteur low;
     Vecteur up;
     // Stocke pour chaque cellule son barycentre.
-    std::map<Index, Data> index2data;
+    std::map<Index, CellData> index2data;
 
 
     // Construit le zipper avec une soupe de triangle en entrée \a
@@ -247,10 +274,15 @@ struct TriangleSoupZipper {
             }
             else
             {
-
+                
                 Vecteur v1 = centroid(i1);
                 Vecteur v2 = centroid(i2);
                 Vecteur v3 = centroid(i3);
+
+
+                index2data[i1].add((*it)[0]);
+                index2data[i2].add((*it)[1]);
+                index2data[i3].add((*it)[2]);
 
                 Triangle newT = Triangle(v1, v2, v3);
                 //on l'ajoute
@@ -259,30 +291,26 @@ struct TriangleSoupZipper {
         }
     }
 
-};
+     void smartZip(){
+    
+        index2data.clear();
 
-// Structure pour calculer le barycentre d'un ensemble de points.
-struct CellData {
-  Vecteur acc;
-  int nb;
-  // Crée un accumulateur vide.
-  CellData(): acc(), nb(0) {}
-  // Ajoute le point v à l'accumulateur.
-  void add( const Vecteur& v ){
-    acc.xyz[0] += v.xyz[0];
-    acc.xyz[1] += v.xyz[1];
-    acc.xyz[2] += v.xyz[2];
+        this->zip();
 
-    nb++;
-  }
-  // Retourne le barycentre de tous les points ajoutés.
-  Vecteur barycenter() const{
-    Vecteur v;
-    v.xyz[0] = acc[0]/nb;
-    v.xyz[1] = acc[1]/nb;
-    v.xyz[2] = acc[2]/nb;
-    return v;
-  }
+        for ( std::vector<Triangle>::iterator it = this->_anOutput.triangles.begin(), itE = this->_anOutput.triangles.end(); it != itE; ++it )
+        {
+            Index i1 = index((*it)[0]);
+            Index i2 = index((*it)[1]);
+            Index i3 = index((*it)[2]);
+
+
+            (*it).xyz[0] = index2data[i1].barycenter();
+            (*it).xyz[1] = index2data[i3].barycenter();
+            (*it).xyz[2] = index2data[i2].barycenter();
+            
+        }
+    }
+
 };
 
 
