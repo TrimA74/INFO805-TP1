@@ -193,6 +193,10 @@ struct TriangleSoupZipper {
     Index size;
     Vecteur low;
     Vecteur up;
+    // Stocke pour chaque cellule son barycentre.
+    std::map<Index, Data> index2data;
+
+
     // Construit le zipper avec une soupe de triangle en entrée \a
     // anInput, une soupe de triangle en sortie \a anOutput, et un index \a size
     // qui est le nombre de cellules de la boîte découpée selon les 3 directions.
@@ -230,7 +234,7 @@ struct TriangleSoupZipper {
 
     void zip(){
     
-        
+
         for ( std::vector<Triangle>::const_iterator it = this->_anInput.triangles.begin(), itE = this->_anInput.triangles.end(); it != itE; ++it )
         {
             Index i1 = index((*it)[0]);
@@ -252,13 +256,35 @@ struct TriangleSoupZipper {
                 //on l'ajoute
                 this->_anOutput.triangles.push_back(newT);
             }
-
-
-
         }
     }
 
 };
+
+// Structure pour calculer le barycentre d'un ensemble de points.
+struct CellData {
+  Vecteur acc;
+  int nb;
+  // Crée un accumulateur vide.
+  CellData(): acc(), nb(0) {}
+  // Ajoute le point v à l'accumulateur.
+  void add( const Vecteur& v ){
+    acc.xyz[0] += v.xyz[0];
+    acc.xyz[1] += v.xyz[1];
+    acc.xyz[2] += v.xyz[2];
+
+    nb++;
+  }
+  // Retourne le barycentre de tous les points ajoutés.
+  Vecteur barycenter() const{
+    Vecteur v;
+    v.xyz[0] = acc[0]/nb;
+    v.xyz[1] = acc[1]/nb;
+    v.xyz[2] = acc[2]/nb;
+    return v;
+  }
+};
+
 
 
 
