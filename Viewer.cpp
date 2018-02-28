@@ -46,8 +46,13 @@ qglviewer::Vec convertToVec(Vecteur& v){
 void Viewer::init()
 {
 
-  Vecteur low,up;
+  Vecteur low = Vecteur();
+  Vecteur up = Vecteur();
   this->ptrSoup->boundingBox(low,up);
+  
+  std::cout << "up " << up << std::endl;
+  std::cout << "low " << low << std::endl;
+
     camera()->setSceneBoundingBox(convertToVec(low),convertToVec(up));
   // ou camera()->setSceneRadius( ... );
   camera()->showEntireScene();
