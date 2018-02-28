@@ -29,7 +29,7 @@ using namespace std;
 //     return 0;
 // }
 
-
+ /***** Q2 ******/
 int main(int argc, char** argv)
 {
 
@@ -57,6 +57,7 @@ int main(int argc, char** argv)
     TriangleSoupZipper tsz = TriangleSoupZipper(ts, anOutput, Index(atoi(argv[3]), atoi(argv[4]), atoi(argv[5])));
     tsz.smartZip();
     std::ofstream output( argv[2]);
+    std::vector<Triangle> tmp =  ts.triangles;
     ts.triangles = tsz._anOutput.triangles;
     ts.write(output);
 
@@ -65,15 +66,16 @@ int main(int argc, char** argv)
     std::cout << "taille sortie  :  " <<  tsz._anOutput.triangles.size() << std::endl;
 
     //Affichage du taux de compression
-    cout <<   tsz._anOutput.triangles.size()*100 / ts.triangles.size()<< "%"<<endl;
+    cout <<   tsz._anOutput.triangles.size()*100 / tmp.size()<< "%"<<endl;
     input.close(); // à la fin
-    viewer.show();
+    //viewer.show();
     // Run main loop.
-    application.exec();
+    //application.exec();
     return 0;
 }
 
-/* Q1
+/****** Q1 ****/
+/*
 int main(int argc, char** argv)
 {
 
