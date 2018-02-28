@@ -112,7 +112,14 @@ struct Triangle {
         return u.cross(v).normalize();
     }
 
+
 };
+
+inline std::ostream& operator<<(std::ostream& os, Triangle t)
+{
+    os << t.xyz[0] << ' ' << t.xyz[1] << ' ' << t.xyz[2];
+    return os;
+}
 
 struct TriangleSoup {
     std::vector<Triangle> triangles; // les triangles
@@ -150,6 +157,13 @@ struct TriangleSoup {
             }
         }
 
+    }
+
+    void write(std::ostream& output){
+        for ( std::vector<Triangle>::iterator it = triangles.begin(), itE = triangles.end(); it != itE; ++it ) {
+            output << (*it);
+            output << "\n";
+        }
     }
     void boundingBox( Vecteur& low, Vecteur& up) const {
         low = triangles[0][0];
@@ -219,14 +233,7 @@ struct CellData {
   }
   // Retourne le barycentre de tous les points ajoutés.
   Vecteur barycenter() const{
-    Vecteur v;
-
-    
-
-    v.xyz[0] = acc[0]/nb;
-    v.xyz[1] = acc[1]/nb;
-    v.xyz[2] = acc[2]/nb;
-    return v;
+    return acc / nb;
   }
 };
 

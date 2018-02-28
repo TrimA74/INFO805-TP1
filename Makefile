@@ -113,7 +113,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		main.cpp
 QMAKE_TARGET  = viewer
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = viewer
+TARGET        = viewerQ2
 
 
 first: all
