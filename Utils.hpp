@@ -89,6 +89,9 @@ std::istream& operator>>( std::istream& in, Vecteur& v )
 
 struct Triangle {
     Vecteur xyz[3];
+    Triangle(){
+
+    }
 
 
     Triangle(Vecteur x, Vecteur y, Vecteur z){
@@ -232,6 +235,7 @@ struct TriangleSoupZipper {
     TriangleSoup _anOutput;
     Index size;
     Vecteur low;
+    Vecteur cellSize;
     Vecteur up;
     // Stocke pour chaque cellule son barycentre.
     std::map<Index, CellData> index2data;
@@ -250,6 +254,10 @@ struct TriangleSoupZipper {
         this->up = Vecteur();
         this->_anInput.boundingBox(this->low,this->up);
         this->index2data = std::map<Index, CellData>();
+        this->cellSize = Vecteur((up[0] - low[0])/size[0],
+                                 (up[1] - low[1])/size[1],
+                                 (up[2] - low[2])/size[2]
+        );
 
 
 
@@ -260,9 +268,9 @@ struct TriangleSoupZipper {
         //formule : (index - debut ) / ((fin-debut)/distance-grille)
         Index i;
         
-        i.idx[0] = (int)(p.xyz[0] - low[0]) / ((up.xyz[0] - low.xyz[0]) / size.idx[0]);
-        i.idx[1] = (int)(p.xyz[1] - low[1]) / ((up.xyz[1] - low.xyz[1]) / size.idx[1]);
-        i.idx[2] = (int)(p.xyz[2] - low[2]) / ((up.xyz[2] - low.xyz[2]) / size.idx[2]);
+        i.idx[0] = (int)(p.xyz[0] - low[0]) / cellSize[0];
+        i.idx[1] = (int)(p.xyz[1] - low[1]) / cellSize[1];
+        i.idx[2] = (int)(p.xyz[2] - low[2]) / cellSize[2];
 
         return i;
     } 
@@ -270,16 +278,11 @@ struct TriangleSoupZipper {
     /// @return le centroïde de la cellule d'index \a idx (son "centre").
     Vecteur centroid( const Index& idx ) const {
         Vecteur v;
-
-        std::cout << idx.idx[0] << idx.idx[1] << idx.idx[2] << std::endl;
-
-        std::cout << "deuxieme" << low << std::endl;
-                std::cout << "deuxieme" << up << std::endl;
         
         //calcul du centroid
-        v.xyz[0] = idx.idx[0]*((up.xyz[0] - low.xyz[0]) / size.idx[0])+(((up.xyz[0] - low.xyz[0]) / size.idx[0])/2)+low[0];
-        v.xyz[1] = idx.idx[1]*((up.xyz[1] - low.xyz[1]) / size.idx[1])+(((up.xyz[1] - low.xyz[1]) / size.idx[1])/2)+low[1];
-        v.xyz[2] = idx.idx[2]*((up.xyz[2] - low.xyz[2]) / size.idx[2])+(((up.xyz[2] - low.xyz[2]) / size.idx[2])/2)+low[2];
+        v.xyz[0] = idx.idx[0]*cellSize[0]+(cellSize[0]/2)+low[0];
+        v.xyz[1] = idx.idx[1]*cellSize[1]+(cellSize[1]/2)+low[1];
+        v.xyz[2] = idx.idx[2]*cellSize[2]+(cellSize[2]/2)+low[2];
 
         return v;
     }
@@ -289,27 +292,22 @@ struct TriangleSoupZipper {
 
         for ( std::vector<Triangle>::const_iterator it = this->_anInput.triangles.begin(), itE = this->_anInput.triangles.end(); it != itE; ++it )
         {
-            Index i1 = index((*it)[0]);
-            Index i2 = index((*it)[1]);
-            Index i3 = index((*it)[2]);
 
-            if(i1 == i2 || i1 == i3 || i2 == i3)
-            {
-                //on jette le triangle
+            Index idx[3];
+
+            for (int i = 0; i < 3; ++i) {
+                idx[i] = index((*it)[i]);
+                index2data[idx[i]].add((*it)[i]);
             }
-            else
+
+            if(!(idx[0] == idx[1] || idx[0] == idx[2] || idx[1] == idx[2]))
             {
+                Triangle newT;
+                for (int i = 0; i < 3; ++i) {
+                    newT[i] = centroid(idx[i]);
+                }
 
-                Vecteur v1 = centroid(i1);
-                Vecteur v2 = centroid(i2);
-                Vecteur v3 = centroid(i3);
 
-
-                index2data[i1].add((*it)[0]);
-                index2data[i2].add((*it)[1]);
-                index2data[i3].add((*it)[2]);
-
-                Triangle newT = Triangle(v1, v2, v3);
                 //on l'ajoute
                 this->_anOutput.triangles.push_back(newT);
             }
@@ -318,39 +316,17 @@ struct TriangleSoupZipper {
 
      void smartZip(){
     
-        //index2data.clear();
+        index2data.clear();
 
         this->zip();
-         Index i = index(this->_anOutput.triangles[0][0]);
-        Vecteur v2 = centroid(i);
-         Index nI = index(v2);
-
-        // low = Vecteur(-5,-5,-5);
-        // up = Vecteur(5,5,5);
-        // Vecteur v = Vecteur(1.2,3.4,-1.7);
-        // Index i = index(v);
-        //  Vecteur v2 = centroid(i);
-        //  Index nI = index(v2);
-
-
-         std::cout << i.idx[0] << i.idx[1] << i.idx[2] << std::endl;
-         std::cout << v2 << std::endl;
-         std::cout << nI.idx[0] << nI.idx[1] << nI.idx[2] << std::endl;
-        // std::cout << index2data[Index(0,5,9)].nb << std::endl;
 
         for ( std::vector<Triangle>::iterator it = this->_anOutput.triangles.begin(), itE = this->_anOutput.triangles.end(); it != itE; ++it )
         {
-            
-            Index i1 = index((*it)[0]);
-            Index i2 = index((*it)[1]);
-            Index i3 = index((*it)[2]);
 
+            for (int j = 0; j < 3; ++j) {
 
-
-            (*it)[0] = index2data[i1].barycenter();
-            (*it)[1] = index2data[i2].barycenter();
-            (*it)[2] = index2data[i3].barycenter();
-            
+                (*it).xyz[j] = index2data[index((*it).xyz[j])].barycenter();
+            }
         }
 
     }
